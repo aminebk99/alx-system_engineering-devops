@@ -1,13 +1,18 @@
-#!/usr/bin/env bash
-#Install nginx web server and Redirection
-custom_header="add_header X-Served-By \$hostname"
+#!/bin/bash
 
+# Configure Nginx to add custom HTTP response header
 sudo apt-get update
 sudo apt-get install -y nginx
-sudo sh -c 'echo "Hello World!" > /var/www/html/index.nginx-debian.html'
-sudo sed -i '/^}$/i \ \n\tlocation \/redirect_me {return 301 https:\/\/youtu.be\/dBmxNsS3BGE?si=q-uzku7Oor1j-liO;}' /etc/nginx/sites-available/default
-sudo sed -i '/^}$/i \ \n\tlocation @404 {return 404 "Ceci n'\''est pas une page\\n";}' /etc/nginx/sites-available/default
-sudo sed -i 's/=404/@404/g' /etc/nginx/sites-available/default
-sudo sed -i "0,/location \/ {/s/location \/ {/&\n\t\t$custom_header;/" /etc/nginx/sites-available/default
-sudo service nginx restart
+
+# Create a custom Nginx configuration file
+sudo sh -c 'echo "add_header X-Served-By $HOSTNAME;" > /etc/nginx/custom_http_response.conf'
+
+# Link the custom configuration file to the sites-available directory
+sudo ln -s /etc/nginx/custom_http_response.conf /etc/nginx/sites-available/
+
+# Enable the custom configuration by creating a symbolic link in the sites-enabled directory
+sudo ln -s /etc/nginx/sites-available/custom_http_response.conf /etc/nginx/sites-enabled/
+
+# Restart Nginx to apply the changes
+sudo systemctl restart nginx
 
