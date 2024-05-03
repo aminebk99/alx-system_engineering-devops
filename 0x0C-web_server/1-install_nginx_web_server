@@ -2,8 +2,9 @@
 # installs nginx on a remote server with its configuration
 
 sudo apt-get -y update
-sudo apt-get -y install nginx ufw  # Installing ufw package
+sudo apt-get -y install nginx
 sudo ufw allow 'Nginx HTTP'
-echo 'Hello World!' > /var/www/html/index.nginx-debian.html
-sudo service nginx start
+echo 'Hello World!' | sudo tee /var/www/html/index.html
+sudo nginx -t
+sudo service nginx reload
 
