@@ -1,12 +1,23 @@
 #!/usr/bin/env bash
-#Install nginx web server and Redirection
-custom_header="add_header X-Served-By \$hostname"
+# Customizing a 404-error_page
 
+# Updating Packages before performing installations
 sudo apt-get update
 sudo apt-get install -y nginx
-sudo sh -c 'echo "Hello World!" > /var/www/html/index.nginx-debian.html'
-sudo sed -i '/^}$/i \ \n\tlocation \/redirect_me {return 301 https:\/\/www.youtube.com\/watch?v=dBmxNsS3BGE&t=58s;}' /etc/nginx/sites-available/default
-sudo sed -i '/^}$/i \ \n\tlocation @404 {return 404 "Ceci n'\''est pas une page\\n";}' /etc/nginx/sites-available/default
-sudo sed -i 's/=404/@404/g' /etc/nginx/sites-available/default
-sudo sed -i "0,/location \/ {/s/location \/ {/&\n\t\t$custom_header;/" /etc/nginx/sites-available/default
+
+# Creating an index.html page
+echo "Hello World!" | sudo tee /var/www/html/index.html
+
+# Performing a "moved permanently redirection" (301)
+new_string="server_name _;\n\trewrite ^\/redirect_me https:\/\/github.com\/aminebk99 permanent;"
+sudo sed -i "s/server_name _;/$new_string/" /etc/nginx/sites-enabled/default
+
+# Creating a 404 Custom error page
+echo "this page not found 404" | sudo tee /var/www/html/404.html
+# Custom HTTP response header
+sudo sed -i "server_name _;/a add_header X-Served-By $HOSTNAME;" /etc/nginx/sites-enabled/default
+# Testing configurations for syntax errors
+sudo nginx -t
+
+# restart nginx after implementing changes
 sudo service nginx restart
